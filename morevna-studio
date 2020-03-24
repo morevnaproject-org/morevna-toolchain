@@ -6,8 +6,20 @@ set -e
 
 exec()
 {
-    # TODO: Update if needed
-    # if MOREVNASTUDIO_VERSION ...
+    
+    if [ -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
+    source $HOME/.config/morevna-studio/morevna-studio.conf
+    fi
+    if [ ! -z $MOREVNA_CACHEDIR ]; then
+    export ZEROINSTALL_PORTABLE_BASE=$MOREVNA_CACHEDIR
+    fi
+    
+    if [ -f $HOME/.config/morevna-studio/morevna-studio.version ]; then
+	source $HOME/.config/morevna-studio/morevna-studio.version
+    fi
+    if [ "x$MOREVNASTUDIO_VERSION" != "x$MOREVNASTUDIO_INSTALLED_VERSION" ]; then
+	install
+    fi
     
     MOREVNASTUDIO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
     
@@ -35,9 +47,22 @@ install()
 {
     echo "Installing Morevna Studio..."
     
-    # TODO: install scripts from "launchers/" dir
+    [ -d $HOME/.local/morevna-studio/bin/ ] || mkdir -p $HOME/.local/morevna-studio/bin/
+    # TODO: install scripts from "apps/" dir
     
-    # TODO: ask location for packages (allow to place on SSD partition)
+    [ -d $HOME/.config/morevna-studio/ ] || mkdir -p $HOME/.config/morevna-studio/
+    if [ ! -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
+	# TODO: ask location for packages (allow to place on SSD partition)
+	if false; then
+	    [ -d /opt/morevna-studio/$USER ] || sudo mkdir -p /opt/morevna-studio/$USER
+	    sudo chmod 700 /opt/morevna-studio/$USER
+	    sudo chown $USER /opt/morevna-studio/$USER
+	    echo "MOREVNA_CACHEDIR=/opt/morevna-studio/$USER" > $HOME/.config/morevna-studio/morevna-studio.conf
+	fi
+    fi
+    
+    echo "MOREVNASTUDIO_INSTALLED_VERSION=$MOREVNASTUDIO_VERSION" > $HOME/.config/morevna-studio/morevna-studio.version
+    
 }
 
 uninstall()
@@ -86,7 +111,7 @@ main()
 	    exec "${@:2}"
 	    ;;
 	install)      
-	    install
+	    install "${@:2}"
 	    ;;
 	uninstall)
 	    uninstall

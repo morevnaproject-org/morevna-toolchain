@@ -1,3 +1,5 @@
 #!/bin/bash
 
+source $HOME/.config/morevna-studio/morevna-studio.conf
+
 0install https://.../morevna-studio.xml exec blender "$@"
