@@ -11,7 +11,7 @@ exec()
     
     MOREVNASTUDIO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
     
-    source "${MOREVNASTUDIO_DIR}/apps/${1}.conf"
+    source "${MOREVNASTUDIO_DIR}/apps/${1}/${1}.conf"
     
     APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
     
@@ -28,7 +28,7 @@ exec()
 	VERSION_OPTION="--version=${APP_VERSION}"
     fi
     
-    0install run ${VERSION_OPTION} ${URI} "${@:2}"
+    0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
 }
 
 install()
