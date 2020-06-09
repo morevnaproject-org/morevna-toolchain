@@ -4,14 +4,46 @@ MOREVNASTUDIO_VERSION=0.1
 
 set -e
 
+find_version() {
+	if [ -d "$1" ]; then
+		pushd "$1" >/dev/null
+		TESTDIR=`pwd -P`
+		popd >/dev/null
+	else
+		TESTDIR="$1"
+	fi
+	if [ -f "$TESTDIR/packages.txt" ]; then
+		# Read contents of file
+		VERSION=""
+		while IFS= read -r line
+		do
+		    PACKAGE="${line%%=*}"
+		    if [[ "$PACKAGE" == "$APP" ]]; then
+			VERSION="${line#*=}"
+			break
+		    fi
+		done < "$TESTDIR/packages.txt"
+		if [ -z "$VERSION" ]; then
+		    find_packages_file "`dirname \"$TESTDIR\"`"
+		else
+		    echo "$VERSION"
+		fi
+	else
+		if [[ "$TESTDIR" == '/' ]]; then
+			exit
+		fi
+		find_packages_file "`dirname \"$TESTDIR\"`"
+	fi
+}
+
 exec()
 {
     
     if [ -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
     source $HOME/.config/morevna-studio/morevna-studio.conf
     fi
-    if [ ! -z $MOREVNA_CACHEDIR ]; then
-    export ZEROINSTALL_PORTABLE_BASE=$MOREVNA_CACHEDIR
+    if [ ! -z $MOREVNASTUDIO_CACHEDIR ]; then
+    export ZEROINSTALL_PORTABLE_BASE=$MOREVNASTUDIO_CACHEDIR
     fi
     
     if [ -f $HOME/.config/morevna-studio/morevna-studio.version ]; then
@@ -21,19 +53,20 @@ exec()
 	install
     fi
     
-    MOREVNASTUDIO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-    
-    source "${MOREVNASTUDIO_DIR}/apps/${1}/${1}.conf"
+    source "${MOREVNASTUDIO_DIR}/packages/${1}/${1}.conf"
     
     APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
     
     #APP_VERSION=$MOREVNA_VERSION_BLENDER
-    eval APP_VERSION='$MOREVNA_VERSION_'$APP_NAME_UPPERCASE
-    
-    if [ -z $APP_VERSION ]; then
+    #eval APP_VERSION='$MOREVNA_VERSION_'$APP_NAME_UPPERCASE
+    #
+    #if [ -z $APP_VERSION ]; then
 	# TODO: Detect version from RenderChan
-	echo ...
-    fi
+	#echo ...
+    #fi
+    
+    export APP="$1"
+    APP_VERSION="$(find_version `pwd`)"
     
     VERSION_OPTION=""
     if [ ! -z $APP_VERSION ]; then
@@ -52,12 +85,20 @@ install()
     
     [ -d $HOME/.config/morevna-studio/ ] || mkdir -p $HOME/.config/morevna-studio/
     if [ ! -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
-	# TODO: ask location for packages (allow to place on SSD partition)
+	source ${MOREVNASTUDIO_DIR}/morevna-studio.conf
+	cp ${MOREVNASTUDIO_DIR}/morevna-studio.conf $HOME/.config/morevna-studio/morevna-studio.conf
+
+	# TODO: ask location for packages (allow to place on SSD partition)		
 	if false; then
 	    [ -d /opt/morevna-studio/$USER ] || sudo mkdir -p /opt/morevna-studio/$USER
 	    sudo chmod 700 /opt/morevna-studio/$USER
 	    sudo chown $USER /opt/morevna-studio/$USER
-	    echo "MOREVNA_CACHEDIR=/opt/morevna-studio/$USER" > $HOME/.config/morevna-studio/morevna-studio.conf
+	    echo "MOREVNASTUDIO_CACHEDIR=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.conf
+	fi
+	
+	if [[ "$USE_0INSTALL" == "0" ]]; then
+	    echo "MOREVNASTUDIO_LAUNCHER=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.conf
+	else
 	fi
     fi
     
@@ -101,6 +142,9 @@ main()
 	usage
 	exit 1
     fi
+    
+    SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+    export MOREVNASTUDIO_DIR=`dirname "$SCRIPTPATH"`
     
     case $1 in
 	exec)
