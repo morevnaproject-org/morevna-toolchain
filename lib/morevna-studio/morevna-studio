@@ -72,6 +72,15 @@ exec()
     
     APP_VERSION="$(find_version `pwd`)"
     
+    # 1. Look for installed package in opt
+    # 1.a. If version is empty
+    #  - /opt/package
+    #  - /opt/package-version
+    #  - 0install
+    # 1.b. If version is not empty
+    #  - /opt/package-version
+    #  - 0install
+    
     VERSION_OPTION=""
     if [ ! -z $APP_VERSION ]; then
 	VERSION_OPTION="--version=${APP_VERSION}"
