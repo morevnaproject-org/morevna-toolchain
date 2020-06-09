@@ -24,7 +24,7 @@ find_version() {
 		    fi
 		done < "$TESTDIR/packages.txt"
 		if [ -z "$VERSION" ]; then
-		    find_packages_file "`dirname \"$TESTDIR\"`"
+		    find_version "`dirname \"$TESTDIR\"`"
 		else
 		    echo "$VERSION"
 		fi
@@ -32,7 +32,7 @@ find_version() {
 		if [[ "$TESTDIR" == '/' ]]; then
 			exit
 		fi
-		find_packages_file "`dirname \"$TESTDIR\"`"
+		find_version "`dirname \"$TESTDIR\"`"
 	fi
 }
 
@@ -96,10 +96,7 @@ install()
 	    echo "MOREVNASTUDIO_CACHEDIR=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.conf
 	fi
 	
-	if [[ "$USE_0INSTALL" == "0" ]]; then
-	    echo "MOREVNASTUDIO_LAUNCHER=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.conf
-	else
-	fi
+	echo "MOREVNASTUDIO_LAUNCHER=\"${MOREVNASTUDIO_DIR}/bin/morevna-studio\"" >> $HOME/.config/morevna-studio/morevna-studio.conf
     fi
     
     echo "MOREVNASTUDIO_INSTALLED_VERSION=$MOREVNASTUDIO_VERSION" > $HOME/.config/morevna-studio/morevna-studio.version
