@@ -69,8 +69,21 @@ exec()
 	#echo ...
     #fi
     
-    
-    APP_VERSION="$(find_version `pwd`)"
+    # find which file we are working with
+    ARG_FILE=""
+    for ARG in "$@"; do
+	for EXT in "${EXTENSIONS[@]}"; do
+	    if [[ "$ARG" == *.${EXT} ]]; then
+		ARG_FILE=${ARG}
+	    fi
+	done
+    done
+    # find package version defined for this file
+    if [ ! -z "${ARG_FILE}" ]; then
+	APP_VERSION=$(find_version `dirname "${ARG_FILE}"`)
+    else
+	APP_VERSION=$(find_version `pwd`)
+    fi
     
     # 1. Look for installed package in opt
     # 1.a. If version is empty
