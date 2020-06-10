@@ -39,6 +39,11 @@ find_version() {
 exec()
 {
     
+    if [ -z ${MOREVNASTUDIO_PATH_IS_SET} ];then
+    export PATH="${MOREVNASTUDIO_DIR}/bin/:$PATH"
+    fi
+    export MOREVNASTUDIO_PATH_IS_SET=1
+
     source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf
     
     if [ -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
@@ -90,10 +95,12 @@ exec()
     
     # 1. Look for installed package in opt
     # 1.a. If version is empty
+    #  - ini configuration
     #  - /opt/package
-    #  - /opt/package-version
     #  - 0install
+    #  - /opt/package-version (latest) (fallback)
     # 1.b. If version is not empty
+    #  - ini configuration
     #  - /opt/package-version
     #  - 0install
     
