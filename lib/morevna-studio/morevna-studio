@@ -76,10 +76,11 @@ exec()
     for ARG in "$@"; do
 	for EXT in "${EXTENSIONS[@]}"; do
 	    if [[ "$ARG" == *.${EXT} ]]; then
-		ARG_FILE=${ARG}
+		ARG_FILE="${ARG}"
 	    fi
 	done
     done
+    
     # find package version defined for this file
     if [ ! -z "${ARG_FILE}" ]; then
 	APP_VERSION=$(find_version `dirname "${ARG_FILE}"`)
