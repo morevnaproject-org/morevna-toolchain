@@ -2,7 +2,10 @@
 
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPTPATH}/../etc/morevna-studio.conf
+
+if [ -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
 source $HOME/.config/morevna-studio/morevna-studio.conf
+fi
 
 if [ "$USE_0INSTALL" == "0" ]; then
     "${SCRIPTPATH}/../lib/morevna-studio/morevna-studio" "$@"
