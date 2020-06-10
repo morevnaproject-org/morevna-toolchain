@@ -52,7 +52,9 @@ exec()
 	source $HOME/.config/morevna-studio/morevna-studio.version
     fi
     if [ "x$MOREVNASTUDIO_VERSION" != "x$MOREVNASTUDIO_INSTALLED_VERSION" ]; then
-	install
+	if [ -f "${MOREVNASTUDIO_DIR}/lib/morevna-studio/user-install" ]; then
+	    bash "${MOREVNASTUDIO_DIR}/lib/morevna-studio/user-install"
+	fi
     fi
     
     export APP="$1"
@@ -102,40 +104,6 @@ exec()
     0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
 }
 
-install()
-{
-    echo "Installing Morevna Studio..."
-    
-    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf
-    
-    [ -d $HOME/.local/morevna-studio/bin/ ] || mkdir -p $HOME/.local/morevna-studio/bin/
-    # TODO: install scripts from "apps/" dir
-    
-    [ -d $HOME/.config/morevna-studio/ ] || mkdir -p $HOME/.config/morevna-studio/
-    if [ ! -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
-	#cp ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf $HOME/.config/morevna-studio/morevna-studio.conf
-
-	# TODO: ask location for packages (allow to place on SSD partition)		
-	if false; then
-	    [ -d /opt/morevna-studio/$USER ] || sudo mkdir -p /opt/morevna-studio/$USER
-	    sudo chmod 700 /opt/morevna-studio/$USER
-	    sudo chown $USER /opt/morevna-studio/$USER
-	    echo "MOREVNASTUDIO_CACHEDIR=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.conf
-	fi
-	
-	#echo "MOREVNASTUDIO_LAUNCHER=\"${MOREVNASTUDIO_DIR}/bin/morevna-studio\"" >> $HOME/.config/morevna-studio/morevna-studio.conf
-    fi
-    
-    echo "MOREVNASTUDIO_INSTALLED_VERSION=$MOREVNASTUDIO_VERSION" > $HOME/.config/morevna-studio/morevna-studio.version
-    
-}
-
-uninstall()
-{
-    echo "Uninstalling Morevna Studio..."
-    # TODO: revert all operations done by install action
-}
-
 usage()
 {
 cat << EOF
@@ -146,8 +114,6 @@ Morevna Studio - software manager for animation production
 
 Usage:
     morevna-studio exec APP [ARGS]
-    morevna-studio install
-    morevna-studio uninstall
    
 Examples:
     morevna-studio exec blender
@@ -178,12 +144,6 @@ main()
 		exit 1
 	    fi
 	    exec "${@:2}"
-	    ;;
-	install)      
-	    install "${@:2}"
-	    ;;
-	uninstall)
-	    uninstall
 	    ;;
 	*)
 	    usage

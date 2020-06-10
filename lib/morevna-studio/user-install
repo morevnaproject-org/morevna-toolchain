@@ -1,0 +1,35 @@
+#!/bin/bash
+
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+export MOREVNASTUDIO_DIR=`dirname "$SCRIPTPATH"`
+MOREVNASTUDIO_DIR=`dirname "$MOREVNASTUDIO_DIR"`
+
+install()
+{
+    echo "Installing Morevna Studio..."
+    
+    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf
+    
+    #[ -d $HOME/.local/morevna-studio/bin/ ] || mkdir -p $HOME/.local/morevna-studio/bin/
+    # TODO: install scripts from "apps/" dir
+    
+    [ -d $HOME/.config/morevna-studio/ ] || mkdir -p $HOME/.config/morevna-studio/
+    if [ ! -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
+	#cp ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf $HOME/.config/morevna-studio/morevna-studio.conf
+
+	# TODO: ask location for packages (allow to place on SSD partition)
+	if false; then
+	    [ -d /opt/morevna-studio/$USER ] || sudo mkdir -p /opt/morevna-studio/$USER
+	    sudo chmod 700 /opt/morevna-studio/$USER
+	    sudo chown $USER /opt/morevna-studio/$USER
+	    echo "MOREVNASTUDIO_CACHEDIR=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.conf
+	fi
+	
+	#echo "MOREVNASTUDIO_LAUNCHER=\"${MOREVNASTUDIO_DIR}/bin/morevna-studio\"" >> $HOME/.config/morevna-studio/morevna-studio.conf
+    fi
+    
+    echo "MOREVNASTUDIO_INSTALLED_VERSION=$MOREVNASTUDIO_VERSION" > $HOME/.config/morevna-studio/morevna-studio.version
+    
+}
+
+install "$@"
