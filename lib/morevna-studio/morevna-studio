@@ -56,7 +56,7 @@ exec()
     if [ -f $HOME/.config/morevna-studio/morevna-studio.version ]; then
 	source $HOME/.config/morevna-studio/morevna-studio.version
     fi
-    if [ "x$MOREVNASTUDIO_VERSION" != "x$MOREVNASTUDIO_INSTALLED_VERSION" ]; then
+    if [ ! -z "MOREVNASTUDIO_INSTALLED_VERSION" ] && [ "x$MOREVNASTUDIO_VERSION" != "x$MOREVNASTUDIO_INSTALLED_VERSION" ]; then
 	if [ -f "${MOREVNASTUDIO_DIR}/lib/morevna-studio/user-install" ]; then
 	    bash "${MOREVNASTUDIO_DIR}/lib/morevna-studio/user-install"
 	fi
