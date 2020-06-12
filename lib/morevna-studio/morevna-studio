@@ -64,7 +64,9 @@ exec()
     
     export APP="$1"
     
-    source "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf"
+    if [ -f "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf" ]; then
+	source "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf"
+    fi
 
     
     #APP_VERSION=$MOREVNA_VERSION_BLENDER
