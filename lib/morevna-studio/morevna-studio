@@ -44,7 +44,7 @@ exec()
     fi
     export MOREVNASTUDIO_PATH_IS_SET=1
 
-    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf
+    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini
     
     if [ -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
     source $HOME/.config/morevna-studio/morevna-studio.conf
@@ -65,11 +65,9 @@ exec()
     export APP="$1"
     
     source "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf"
+
     
-    #APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
-    #
     #APP_VERSION=$MOREVNA_VERSION_BLENDER
-    #eval APP_VERSION='$MOREVNA_VERSION_'$APP_NAME_UPPERCASE
     #
     #if [ -z $APP_VERSION ]; then
 	# TODO: Detect version from RenderChan
@@ -93,23 +91,78 @@ exec()
 	APP_VERSION=$(find_version `pwd`)
     fi
     
-    # 1. Look for installed package in opt
-    # 1.a. If version is empty
+    # a. If version is not empty
+    #  - ini configuration
+    #  - /opt/package-version
+    #  - 0install
+    # b. If version is empty
     #  - ini configuration
     #  - /opt/package
     #  - 0install
     #  - /opt/package-version (latest) (fallback)
-    # 1.b. If version is not empty
-    #  - ini configuration
-    #  - /opt/package-version
-    #  - 0install
     
-    VERSION_OPTION=""
-    if [ ! -z $APP_VERSION ]; then
-	VERSION_OPTION="--version=${APP_VERSION}"
+    
+    if [ ! -z ${APP_VERSION} ]; then
+	FOUND=0
+	# 1. Read ini configuration
+	if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ]; then
+	    source "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
+	    eval APP_PATH=${APP}'_'${APP_VERSION}
+	    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+		FOUND=1
+		"${APP_PATH}" "${@:2}"
+	    fi
+	fi
+	# 2. Check packages in opt
+	if [ ${FOUND} != 1 ]; then
+	    APP_DIR="${APP}-${APP_VERSION}"
+	    for DIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+		APP_PATH="${DIR}/${APP_DIR}/${APP}"
+		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+		    FOUND=1
+		    "${APP_PATH}" "${@:2}"
+		    break
+		fi
+	    done
+	fi
+	# 3. Use 0-install
+	if [ ${FOUND} != 1 ] && [ ${USE_0INSTALL} == 1 ]; then
+	    VERSION_OPTION="--version=${APP_VERSION}"
+	    0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
+	fi
+    else
+	# 1. Read ini configuration
+	if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ]; then
+	    APP_VERSION="DEFAULT"
+	    source "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
+	    eval APP_PATH=${APP}'_'${APP_VERSION}
+	    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+		FOUND=1
+		"${APP_PATH}" "${@:2}"
+	    fi
+	fi
+	# 2. Check packages in opt
+	if [ "${FOUND}" != 1 ]; then
+	    APP_DIR="${APP}"
+	    for DIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+		APP_PATH="${DIR}/${APP_DIR}/${APP}"
+		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+		    FOUND=1
+		    "${APP_PATH}" "${@:2}"
+		    break
+		fi
+	    done
+	fi
+	# 3. Use 0-install
+	if [ "${FOUND}" != 1 ] && [ "${USE_0INSTALL}" == 1 ]; then
+	    VERSION_OPTION=""
+	    0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
+	fi
+	# 4. Use latest installed version
+	# TODO: ...
     fi
-    
-    0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
 }
 
 usage()

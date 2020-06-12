@@ -8,7 +8,7 @@ install()
 {
     echo "Installing Morevna Studio..."
     
-    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf
+    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini
     
     #[ -d $HOME/.local/morevna-studio/bin/ ] || mkdir -p $HOME/.local/morevna-studio/bin/
     # TODO: install scripts from "apps/" dir
