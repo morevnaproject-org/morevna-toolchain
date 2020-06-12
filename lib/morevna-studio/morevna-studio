@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MOREVNASTUDIO_VERSION=0.1
+export MOREVNASTUDIO_VERSION=0.1
 
 set -e
 
@@ -46,8 +46,8 @@ exec()
 
     source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini
     
-    if [ -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
-    source $HOME/.config/morevna-studio/morevna-studio.conf
+    if [ -f $HOME/.config/morevna-studio/morevna-studio.ini ]; then
+    source $HOME/.config/morevna-studio/morevna-studio.ini
     fi
     if [ ! -z $MOREVNASTUDIO_CACHEDIR ]; then
     export ZEROINSTALL_PORTABLE_BASE=$MOREVNASTUDIO_CACHEDIR

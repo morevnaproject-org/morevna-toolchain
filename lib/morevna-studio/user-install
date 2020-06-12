@@ -14,18 +14,18 @@ install()
     # TODO: install scripts from "apps/" dir
     
     [ -d $HOME/.config/morevna-studio/ ] || mkdir -p $HOME/.config/morevna-studio/
-    if [ ! -f $HOME/.config/morevna-studio/morevna-studio.conf ]; then
-	#cp ${MOREVNASTUDIO_DIR}/etc/morevna-studio.conf $HOME/.config/morevna-studio/morevna-studio.conf
+    if [ ! -f $HOME/.config/morevna-studio/morevna-studio.ini ]; then
+	#cp ${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini $HOME/.config/morevna-studio/morevna-studio.ini
 
 	# TODO: ask location for packages (allow to place on SSD partition)
 	if false; then
 	    [ -d /opt/morevna-studio/$USER ] || sudo mkdir -p /opt/morevna-studio/$USER
 	    sudo chmod 700 /opt/morevna-studio/$USER
 	    sudo chown $USER /opt/morevna-studio/$USER
-	    echo "MOREVNASTUDIO_CACHEDIR=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.conf
+	    echo "MOREVNASTUDIO_CACHEDIR=/opt/morevna-studio/$USER" >> $HOME/.config/morevna-studio/morevna-studio.ini
 	fi
 	
-	#echo "MOREVNASTUDIO_LAUNCHER=\"${MOREVNASTUDIO_DIR}/bin/morevna-studio\"" >> $HOME/.config/morevna-studio/morevna-studio.conf
+	#echo "MOREVNASTUDIO_LAUNCHER=\"${MOREVNASTUDIO_DIR}/bin/morevna-studio\"" >> $HOME/.config/morevna-studio/morevna-studio.ini
     fi
     
     [ -d "$HOME/.local/share/icons/" ] || mkdir -p "$HOME/.local/share/icons/"
