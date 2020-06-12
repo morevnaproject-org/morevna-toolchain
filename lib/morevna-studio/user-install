@@ -39,6 +39,11 @@ install()
 	    "${MOREVNASTUDIO_DIR}/share/applications/$FILE" > "$HOME/.local/share/applications/$FILE"
     done
     
+    [ -d "$HOME/.local/share/mime/packages/" ] || mkdir -p "$HOME/.local/share/mime/packages/"
+    for FILE in `ls -1 "${MOREVNASTUDIO_DIR}/share/mime/packages"`; do
+	cp -f "${MOREVNASTUDIO_DIR}/share/mime/packages/$FILE" "$HOME/.local/share/mime/packages/"
+    done
+    
     update-desktop-database $HOME/.local/share/applications
     
     #kbuildsycoca5 || kbuildsycoca4 --noincremental || true

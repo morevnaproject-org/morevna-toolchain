@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOREVNASTUDIO_VERSION=0.1
+export MOREVNASTUDIO_VERSION=0.2
 
 set -e
 
