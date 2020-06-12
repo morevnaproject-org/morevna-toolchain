@@ -4,6 +4,45 @@ export MOREVNASTUDIO_VERSION=0.2
 
 set -e
 
+compare_versions () {
+    #
+    # Source - https://stackoverflow.com/a/4025065
+    #
+    
+    if [[ $1 == $2 ]]
+    then
+        echo '='
+	return 0
+    fi
+    
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            echo '>'
+	    return 0
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            echo '<'
+	    return 0
+        fi
+    done
+    return 0
+}
+
 find_version() {
 	if [ -d "$1" ]; then
 		pushd "$1" >/dev/null
@@ -63,6 +102,7 @@ exec()
     fi
     
     export APP="$1"
+    APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
     
     if [ -f "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf" ]; then
 	source "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf"
@@ -119,8 +159,8 @@ exec()
 	# 2. Check packages in opt
 	if [ ${FOUND} != 1 ]; then
 	    APP_DIR="${APP}-${APP_VERSION}"
-	    for DIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
-		APP_PATH="${DIR}/${APP_DIR}/${APP}"
+	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+		APP_PATH="${OPTDIR}/${APP_DIR}/${APP}"
 		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		    FOUND=1
 		    "${APP_PATH}" "${@:2}"
@@ -138,7 +178,6 @@ exec()
 	if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ]; then
 	    APP_VERSION="DEFAULT"
 	    source "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
-	    APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
 	    eval APP_PATH=${APP}'_'${APP_VERSION}
 	    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		FOUND=1
@@ -148,8 +187,8 @@ exec()
 	# 2. Check packages in opt
 	if [ "${FOUND}" != 1 ]; then
 	    APP_DIR="${APP}"
-	    for DIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
-		APP_PATH="${DIR}/${APP_DIR}/${APP}"
+	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+		APP_PATH="${OPTDIR}/${APP_DIR}/${APP}"
 		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		    FOUND=1
 		    "${APP_PATH}" "${@:2}"
@@ -163,7 +202,54 @@ exec()
 	    0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
 	fi
 	# 4. Use latest installed version
-	# TODO: ...
+	if [ "${FOUND}" != 1 ]; then
+	    LATEST_VERSION=0
+	    LATEST_VERSION_PATH=""
+	    if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ];then
+		while IFS= read -r line
+		do
+		    APP_PATH="${line#*=}"
+		    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+			VERSION="${line%%=*}"
+			VERSION="${VERSION##*_}"
+			if [[ "${VERSION}" != "DEFAULT" ]]; then
+			    RESULT=`compare_versions $LATEST_VERSION, $VERSION`
+			    if [ "$RESULT" == '<' ]; then
+				LATEST_VERSION="$VERSION"
+				LATEST_VERSION_PATH="${APP_PATH}"
+			    fi
+			fi
+		    fi
+		done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    fi
+	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+		echo ${OPTDIR}
+		for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
+		    APP_PATH="${DIR}/${APP}"
+		    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+			VERSION="${DIR##*-}"
+			echo 1
+			RESULT=`compare_versions $LATEST_VERSION $VERSION`
+			echo 2
+			if [ "$RESULT" == '<' ]; then
+			    LATEST_VERSION="$VERSION"
+			    LATEST_VERSION_PATH="${APP_PATH}"
+			fi
+		    fi
+		    
+		done
+	    done
+	    
+	    if [ ! -z "${LATEST_VERSION_PATH}" ]; then
+		echo "${LATEST_VERSION_PATH}"
+		"${LATEST_VERSION_PATH}" "${@:2}"
+	    else
+		echo "ERROR: Unable to find any installation of '${APP}'."
+		echo "       Please make sure to add following line to '${MOREVNASTUDIO_DIR}/etc/morevnastudio.d/${APP}.ini':"
+		echo "              ${APP_NAME_UPPERCASE}_DEFAULT=\"/path/to/app/binary\""
+		exit 1
+	    fi
+	fi
     fi
 }
 
