@@ -15,8 +15,12 @@ compare_versions () {
 	return 0
     fi
     
+    # Fix '-' (Blender 2.82-1)
+    arg1=${1//-/.}
+    arg2=${2//-/.}
+    
     local IFS=.
-    local i ver1=($1) ver2=($2)
+    local i ver1=($arg1) ver2=($arg2)
     # fill empty fields in ver1 with zeros
     for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
     do
