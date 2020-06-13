@@ -152,10 +152,17 @@ exec()
 	FOUND=0
 	# 1. Read ini configuration
 	if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ]; then
-	    source "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
-	    APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
-	    eval APP_PATH=${APP}'_'${APP_VERSION}
-	    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+	    APP_PATH=""
+	    while IFS= read -r line
+	    do
+		VERSION="${line%%=*}"
+		VERSION="${VERSION##*_}"
+		if [ "${VERSION}" == "${APP_VERSION}" ]; then
+		    APP_PATH="${line#*=}"
+		    break
+		fi
+	    done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		FOUND=1
 		"${APP_PATH}" "${@:2}"
 	    fi
@@ -181,9 +188,17 @@ exec()
 	# 1. Read ini configuration
 	if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ]; then
 	    APP_VERSION="DEFAULT"
-	    source "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
-	    eval APP_PATH=${APP}'_'${APP_VERSION}
-	    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+	    APP_PATH=""
+	    while IFS= read -r line
+	    do
+		VERSION="${line%%=*}"
+		VERSION="${VERSION##*_}"
+		if [ "${VERSION}" == "${APP_VERSION}" ]; then
+		    APP_PATH="${line#*=}"
+		    break
+		fi
+	    done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		FOUND=1
 		"${APP_PATH}" "${@:2}"
 	    fi
