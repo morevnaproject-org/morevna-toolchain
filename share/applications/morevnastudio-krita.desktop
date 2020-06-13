@@ -1,0 +1,16 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Krita (Morevna Studio)
+Exec=krita %f
+GenericName=Digital Painting and Animation
+MimeType=application/x-krita;image/openraster;application/x-krita-paintoppreset;image/png;image/jpg;
+Comment=Digital Painting and Animation
+Type=Application
+Icon=morevnastudio-krita
+Categories=Qt;KDE;Graphics;
+X-KDE-NativeMimeType=application/x-krita
+X-KDE-ExtraNativeMimeTypes=
+StartupNotify=true
+X-Krita-Version=3.1
+X-Desktop-File-Install-Version=0.23
+TryExec=krita
