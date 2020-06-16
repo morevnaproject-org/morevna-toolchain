@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export MOREVNASTUDIO_VERSION=0.3
+export USE_0INSTALL=0
 
 set -e
 
@@ -87,7 +88,9 @@ exec()
     fi
     export MOREVNASTUDIO_PATH_IS_SET=1
 
-    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini
+    if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini" ]; then
+	source "${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini"
+    fi
     
     if [ -f $HOME/.config/morevna-studio/morevna-studio.ini ]; then
     source $HOME/.config/morevna-studio/morevna-studio.ini
