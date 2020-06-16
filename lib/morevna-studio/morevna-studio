@@ -245,21 +245,22 @@ exec()
 		done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
 	    fi
 	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
-		echo ${OPTDIR}
-		for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
-		    APP_PATH="${DIR}/${APP}"
-		    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
-			VERSION="${DIR##*-}"
-			echo 1
-			RESULT=`compare_versions $LATEST_VERSION $VERSION`
-			echo 2
-			if [ "$RESULT" == '<' ]; then
-			    LATEST_VERSION="$VERSION"
-			    LATEST_VERSION_PATH="${APP_PATH}"
+		if [ -f "${OPTDIR}/${APP}-"* ]; then
+		    for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
+			APP_PATH="${DIR}/${APP}"
+			if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+			    VERSION="${DIR##*-}"
+			    echo 1
+			    RESULT=`compare_versions $LATEST_VERSION $VERSION`
+			    echo 2
+			    if [ "$RESULT" == '<' ]; then
+				LATEST_VERSION="$VERSION"
+				LATEST_VERSION_PATH="${APP_PATH}"
+			    fi
 			fi
-		    fi
-		    
-		done
+			
+		    done
+		fi
 	    done
 	    
 	    if [ ! -z "${LATEST_VERSION_PATH}" ]; then
