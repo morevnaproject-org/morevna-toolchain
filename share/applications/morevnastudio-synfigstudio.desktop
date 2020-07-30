@@ -2,7 +2,7 @@
 Type=Application
 Name=Synfig (Morevna Studio)
 GenericName=2D animation software
-Exec=synfigstudio %U
+Exec=synfigstudio
 Icon=morevnastudio-synfigstudio
 Categories=Graphics;
 X-Desktop-File-Install-Version=0.22

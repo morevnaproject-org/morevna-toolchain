@@ -1,7 +1,7 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Name=Krita (Morevna Studio)
-Exec=krita %f
+Exec=krita
 GenericName=Digital Painting and Animation
 MimeType=application/x-krita;image/openraster;application/x-krita-paintoppreset;image/png;image/jpg;
 Comment=Digital Painting and Animation
