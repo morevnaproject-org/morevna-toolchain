@@ -1,0 +1,13 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=OpenToonz (Morevna Studio)
+Exec=opentoonz
+GenericName=Professional 2D animation software
+Comment=Professional 2D animation software
+Type=Application
+Icon=morevnastudio-opentoonz
+Categories=Qt;KDE;Graphics;
+X-KDE-ExtraNativeMimeTypes=
+StartupNotify=true
+X-Desktop-File-Install-Version=0.23
+TryExec=opentoonz
