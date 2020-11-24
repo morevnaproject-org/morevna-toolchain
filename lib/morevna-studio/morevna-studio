@@ -135,9 +135,10 @@ exec()
     
     # find package version defined for this file
     if [ ! -z "${ARG_FILE}" ]; then
-	APP_VERSION=$(find_version `dirname "${ARG_FILE}"`)
+	ARG_FILE_DIRNAME=`dirname "${ARG_FILE}"`
+	APP_VERSION=$(find_version "${ARG_FILE_DIRNAME}")
     else
-	APP_VERSION=$(find_version `pwd`)
+	APP_VERSION=$(find_version "`pwd`")
     fi
     
     # a. If version is not empty
