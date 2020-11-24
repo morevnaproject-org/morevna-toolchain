@@ -8,6 +8,13 @@ uninstall()
 {
     echo "Uninstalling Morevna Studio..."
     # TODO: revert all operations done by install action
+    source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini
+    
+    rm -rf "$HOME/.local/share/icons/morevnastudio-*"
+    rm -rf "$HOME/.local/share/applications/morevnastudio-*"
+    rm -rf "$HOME/.local/share/mime/packages/morevnastudio-*"
+    
+    update-desktop-database $HOME/.local/share/applications
 }
 
 uninstall "$@"
