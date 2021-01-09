@@ -108,7 +108,17 @@ exec()
 	fi
     fi
     
-    export APP="$1"
+    export APP="${1%/*}"
+    export BINARY="${1#*/}"
+    if [ -z ${BINARY} ]; then
+	export BINARY=${APP}
+	export BINARY_0INSTALL_OPTION="run"
+    else
+	# We can call alternative binary via "--command" option.
+	# See - https://docs.0install.net/specifications/feed/#commands
+	export BINARY_0INSTALL_OPTION="${BINARY}"
+    fi
+    
     APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
     
     if [ -f "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf" ]; then
@@ -166,6 +176,8 @@ exec()
 		    break
 		fi
 	    done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    # TODO: On Windows check for .bat or .exe
+	    APP_PATH="${APP_PATH}/${BINARY}"
 	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		FOUND=1
 		"${APP_PATH}" "${@:2}"
@@ -175,7 +187,8 @@ exec()
 	if [ ${FOUND} != 1 ]; then
 	    APP_DIR="${APP}-${APP_VERSION}"
 	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
-		APP_PATH="${OPTDIR}/${APP_DIR}/${APP}"
+		# TODO: On Windows check for .bat or .exe
+		APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
 		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		    FOUND=1
 		    "${APP_PATH}" "${@:2}"
@@ -186,7 +199,9 @@ exec()
 	# 3. Use 0-install
 	if [ ${FOUND} != 1 ] && [ ${USE_0INSTALL} == 1 ]; then
 	    VERSION_OPTION="--version=${APP_VERSION}"
-	    0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
+	    # We can call alternative binary via "--command" option.
+	    # See - https://docs.0install.net/specifications/feed/#commands
+	    0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
 	fi
     else
 	# 1. Read ini configuration
@@ -202,6 +217,8 @@ exec()
 		    break
 		fi
 	    done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    # TODO: On Windows check for .bat or .exe
+	    APP_PATH="${APP_PATH}/${BINARY}"
 	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		FOUND=1
 		"${APP_PATH}" "${@:2}"
@@ -211,7 +228,8 @@ exec()
 	if [ "${FOUND}" != 1 ]; then
 	    APP_DIR="${APP}"
 	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
-		APP_PATH="${OPTDIR}/${APP_DIR}/${APP}"
+		# TODO: On Windows check for .bat or .exe
+		APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
 		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 		    FOUND=1
 		    "${APP_PATH}" "${@:2}"
@@ -222,7 +240,9 @@ exec()
 	# 3. Use 0-install
 	if [ "${FOUND}" != 1 ] && [ "${USE_0INSTALL}" == 1 ]; then
 	    VERSION_OPTION=""
-	    0install run ${VERSION_OPTION} ${URI_0INSTALL} "${@:2}"
+	    # We can call alternative binary via "--command" option.
+	    # See - https://docs.0install.net/specifications/feed/#commands
+	    0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
 	fi
 	# 4. Use latest installed version
 	if [ "${FOUND}" != 1 ]; then
@@ -248,12 +268,11 @@ exec()
 	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
 		if [ -f "${OPTDIR}/${APP}-"* ]; then
 		    for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
-			APP_PATH="${DIR}/${APP}"
+			# TODO: On Windows check for .bat or .exe
+			APP_PATH="${DIR}/${BINARY}"
 			if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 			    VERSION="${DIR##*-}"
-			    echo 1
 			    RESULT=`compare_versions $LATEST_VERSION $VERSION`
-			    echo 2
 			    if [ "$RESULT" == '<' ]; then
 				LATEST_VERSION="$VERSION"
 				LATEST_VERSION_PATH="${APP_PATH}"
