@@ -51,6 +51,22 @@ install()
     
     echo "MOREVNASTUDIO_INSTALLED_VERSION=$MOREVNASTUDIO_VERSION" > $HOME/.config/morevna-studio/morevna-studio.version
     
+    # Configure environment variables
+    [ -f ${HOME}/.profile ] ||  ${HOME}/.profile
+    if ( cat ~/.profile | grep "# morevna-studio/bin" >/dev/null ); then
+	sed -i "/.*# morevna-studio\/bin.*/d"  ${HOME}/.profile
+    fi
+    echo "[ ! -z \${MOREVNASTUDIO_PATH_IS_SET} ] || export PATH=\"${MOREVNASTUDIO_DIR}/bin:\$PATH\" && export MOREVNASTUDIO_PATH_IS_SET=1 # morevna-studio/bin" >> ${HOME}/.profile
+    [ -f ${HOME}/.bash_profile ] || touch ${HOME}/.bash_profile
+    if ( cat ~/.bash_profile | grep "# morevna-studio/bin" >/dev/null ); then
+	sed -i "/.*# morevna-studio\/bin.*/d" $HOME/.bash_profile
+    fi
+    echo "[ ! -z \${MOREVNASTUDIO_PATH_IS_SET} ] || export PATH=\"${MOREVNASTUDIO_DIR}/bin:\$PATH\" && export MOREVNASTUDIO_PATH_IS_SET=1 # morevna-studio/bin" >> ${HOME}/.bash_profile
+    if ( cat ~/.xsessionrc | grep "# morevna-studio/bin" >/dev/null ); then
+	sed -i "/.*# morevna-studio\/bin.*/d" ~/.xsessionrc
+    fi
+    echo "[ ! -z \${MOREVNASTUDIO_PATH_IS_SET} ] || export PATH=\"${MOREVNASTUDIO_DIR}/bin:\$PATH\" && export MOREVNASTUDIO_PATH_IS_SET=1 # morevna-studio/bin" >> ${HOME}/.xsessionrc
+
 }
 
 install "$@"

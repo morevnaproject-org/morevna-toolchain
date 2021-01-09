@@ -7,7 +7,6 @@ MOREVNASTUDIO_DIR=`dirname "$MOREVNASTUDIO_DIR"`
 uninstall()
 {
     echo "Uninstalling Morevna Studio..."
-    # TODO: revert all operations done by install action
     source ${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini
     
     rm -rf "$HOME/.local/share/icons/morevnastudio-*"
@@ -15,6 +14,16 @@ uninstall()
     rm -rf "$HOME/.local/share/mime/packages/morevnastudio-*"
     
     update-desktop-database $HOME/.local/share/applications
+    
+    if ( cat ~/.profile | grep "# morevna-studio/bin" >/dev/null ); then
+        sed -i "/.*# morevna-studio\/bin.*/d"  ${HOME}/.profile
+    fi
+    if ( cat ~/.bash_profile | grep "# morevna-studio/bin" >/dev/null ); then
+        sed -i "/.*# morevna-studio\/bin.*/d" $HOME/.bash_profile
+    fi
+    if ( cat ~/.xsessionrc | grep "# morevna-studio/bin" >/dev/null ); then
+        sed -i "/.*# morevna-studio\/bin.*/d" ~/.xsessionrc
+    fi
 }
 
 uninstall "$@"
