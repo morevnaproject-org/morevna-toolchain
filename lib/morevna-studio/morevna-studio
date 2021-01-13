@@ -110,7 +110,7 @@ exec()
     
     export APP="${1%/*}"
     export BINARY="${1#*/}"
-    if [ -z ${BINARY} ]; then
+    if [ -z ${BINARY} ] || [[ "${APP}" == "${1}" ]]; then
 	export BINARY=${APP}
 	export BINARY_0INSTALL_OPTION="run"
     else
