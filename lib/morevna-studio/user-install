@@ -44,10 +44,15 @@ install()
 	cp -f "${MOREVNASTUDIO_DIR}/share/mime/packages/$FILE" "$HOME/.local/share/mime/packages/"
     done
     
+    [ -d "$HOME/.local/share/mime-info/" ] || mkdir -p "$HOME/.local/share/mime-info/"
+    for FILE in `ls -1 "${MOREVNASTUDIO_DIR}/share/mime-info"`; do
+    	cp -f "${MOREVNASTUDIO_DIR}/share/mime-info/$FILE" "$HOME/.local/share/mime-info/"
+    done
+    
     update-desktop-database $HOME/.local/share/applications
+    update-mime-database $HOME/.local/share/mime/ || true
     
     #kbuildsycoca5 || kbuildsycoca4 --noincremental || true
-    #update-mime-database $HOME/.local/share/mime/ || true
     
     echo "MOREVNASTUDIO_INSTALLED_VERSION=$MOREVNASTUDIO_VERSION" > $HOME/.config/morevna-studio/morevna-studio.version
     
