@@ -199,8 +199,10 @@ exec()
 			VERSION_OPTION="--version=${APP_VERSION}"
 			# We can call alternative binary via "--command" option.
 			# See - https://docs.0install.net/specifications/feed/#commands
+			FOUND=1
 			0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
-		else
+		fi
+		if [ ${FOUND} != 1 ]; then
 			echo "ERROR: Unable to find any installation of '${APP}'."
 			echo "       Please make sure to add following line to"
 			echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
