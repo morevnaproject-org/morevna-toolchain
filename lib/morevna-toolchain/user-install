@@ -1,0 +1,77 @@
+#!/bin/bash
+
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+export MOREVNATOOLCHAIN_DIR=`dirname "$SCRIPTPATH"`
+MOREVNATOOLCHAIN_DIR=`dirname "$MOREVNATOOLCHAIN_DIR"`
+
+install()
+{
+    echo "Installing Morevna Toolchain..."
+    
+    source ${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini
+    
+    #[ -d $HOME/.local/morevna-toolchain/bin/ ] || mkdir -p $HOME/.local/morevna-toolchain/bin/
+    # TODO: install scripts from "apps/" dir
+    
+    [ -d $HOME/.config/morevna-toolchain/ ] || mkdir -p $HOME/.config/morevna-toolchain/
+    if [ ! -f $HOME/.config/morevna-toolchain/morevna-toolchain.ini ]; then
+	#cp ${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini $HOME/.config/morevna-toolchain/morevna-toolchain.ini
+
+	# TODO: ask location for packages (allow to place on SSD partition)
+	if false; then
+	    [ -d /opt/morevna-toolchain/$USER ] || sudo mkdir -p /opt/morevna-toolchain/$USER
+	    sudo chmod 700 /opt/morevna-toolchain/$USER
+	    sudo chown $USER /opt/morevna-toolchain/$USER
+	    echo "MOREVNATOOLCHAIN_CACHEDIR=/opt/morevna-toolchain/$USER" >> $HOME/.config/morevna-toolchain/morevna-toolchain.ini
+	fi
+	
+	#echo "MOREVNATOOLCHAIN_LAUNCHER=\"${MOREVNATOOLCHAIN_DIR}/bin/morevna-toolchain\"" >> $HOME/.config/morevna-toolchain/morevna-toolchain.ini
+    fi
+    
+    [ -d "$HOME/.local/share/icons/" ] || mkdir -p "$HOME/.local/share/icons/"
+    for FILE in `ls -1 "${MOREVNATOOLCHAIN_DIR}/share/icons"`; do
+	cp -f "${MOREVNATOOLCHAIN_DIR}/share/icons/$FILE" "$HOME/.local/share/icons/"
+    done
+    
+    [ -d "$HOME/.local/share/applications/" ] || mkdir -p "$HOME/.local/share/applications/"
+    for FILE in `ls -1 "${MOREVNATOOLCHAIN_DIR}/share/applications"`; do
+	sed "s|Exec=|Exec=${MOREVNATOOLCHAIN_DIR}/bin/|" \
+	    "${MOREVNATOOLCHAIN_DIR}/share/applications/$FILE" > "$HOME/.local/share/applications/$FILE"
+    done
+    
+    [ -d "$HOME/.local/share/mime/packages/" ] || mkdir -p "$HOME/.local/share/mime/packages/"
+    for FILE in `ls -1 "${MOREVNATOOLCHAIN_DIR}/share/mime/packages"`; do
+	cp -f "${MOREVNATOOLCHAIN_DIR}/share/mime/packages/$FILE" "$HOME/.local/share/mime/packages/"
+    done
+    
+    [ -d "$HOME/.local/share/mime-info/" ] || mkdir -p "$HOME/.local/share/mime-info/"
+    for FILE in `ls -1 "${MOREVNATOOLCHAIN_DIR}/share/mime-info"`; do
+    	cp -f "${MOREVNATOOLCHAIN_DIR}/share/mime-info/$FILE" "$HOME/.local/share/mime-info/"
+    done
+    
+    update-desktop-database $HOME/.local/share/applications
+    update-mime-database $HOME/.local/share/mime/ || true
+    
+    #kbuildsycoca5 || kbuildsycoca4 --noincremental || true
+    
+    echo "MOREVNATOOLCHAIN_INSTALLED_VERSION=$MOREVNATOOLCHAIN_VERSION" > $HOME/.config/morevna-toolchain/morevna-toolchain.version
+    
+    # Configure environment variables
+    [ -f ${HOME}/.profile ] ||  ${HOME}/.profile
+    if ( cat ~/.profile | grep "# morevna-toolchain/bin" >/dev/null ); then
+	sed -i "/.*# morevna-toolchain\/bin.*/d"  ${HOME}/.profile
+    fi
+    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"${MOREVNATOOLCHAIN_DIR}/bin:\$PATH\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.profile
+    [ -f ${HOME}/.bash_profile ] || touch ${HOME}/.bash_profile
+    if ( cat ~/.bash_profile | grep "# morevna-toolchain/bin" >/dev/null ); then
+	sed -i "/.*# morevna-toolchain\/bin.*/d" $HOME/.bash_profile
+    fi
+    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"${MOREVNATOOLCHAIN_DIR}/bin:\$PATH\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.bash_profile
+    if ( cat ~/.xsessionrc | grep "# morevna-toolchain/bin" >/dev/null ); then
+	sed -i "/.*# morevna-toolchain\/bin.*/d" ~/.xsessionrc
+    fi
+    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"${MOREVNATOOLCHAIN_DIR}/bin:\$PATH\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.xsessionrc
+
+}
+
+install "$@"

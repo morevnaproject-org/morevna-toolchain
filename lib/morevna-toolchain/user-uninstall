@@ -1,0 +1,29 @@
+#!/bin/bash
+
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+export MOREVNATOOLCHAIN_DIR=`dirname "$SCRIPTPATH"`
+MOREVNATOOLCHAIN_DIR=`dirname "$MOREVNATOOLCHAIN_DIR"`
+
+uninstall()
+{
+    echo "Uninstalling Morevna Toolchain..."
+    source ${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini
+    
+    rm -rf "$HOME/.local/share/icons/morevnatoolchain-*"
+    rm -rf "$HOME/.local/share/applications/morevnatoolchain-*"
+    rm -rf "$HOME/.local/share/mime/packages/morevnatoolchain-*"
+    
+    update-desktop-database $HOME/.local/share/applications
+    
+    if ( cat ~/.profile | grep "# morevna-toolchain/bin" >/dev/null ); then
+        sed -i "/.*# morevna-toolchain\/bin.*/d"  ${HOME}/.profile
+    fi
+    if ( cat ~/.bash_profile | grep "# morevna-toolchain/bin" >/dev/null ); then
+        sed -i "/.*# morevna-toolchain\/bin.*/d" $HOME/.bash_profile
+    fi
+    if ( cat ~/.xsessionrc | grep "# morevna-toolchain/bin" >/dev/null ); then
+        sed -i "/.*# morevna-toolchain\/bin.*/d" ~/.xsessionrc
+    fi
+}
+
+uninstall "$@"

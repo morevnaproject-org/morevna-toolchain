@@ -1,14 +1,13 @@
 [Desktop Entry]
-Name=Blender (Morevna Studio)
+Name=Blender (Morevna Toolchain)
 GenericName=3D modelling and animation software
 Comment=3D modeling, animation, rendering and post-production
 Keywords=3d;cg;modeling;animation;painting;sculpting;texturing;video editing;video tracking;rendering;render engine;cycles;game engine;python;
 Exec=blender
-Icon=morevnastudio-blender
+Icon=morevnatoolchain-blender
 Terminal=false
 Type=Application
 Categories=Graphics;3DGraphics;
 MimeType=application/x-blender;
 X-Desktop-File-Install-Version=0.22
 TryExec=blender
-

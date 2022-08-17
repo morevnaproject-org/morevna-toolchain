@@ -1,12 +1,13 @@
 #!/usr/bin/env xdg-open
+
 [Desktop Entry]
-Name=Krita (Morevna Studio)
+Name=Krita (Morevna Toolchain)
 Exec=krita
 GenericName=Digital Painting and Animation
 MimeType=application/x-krita;image/openraster;application/x-krita-paintoppreset;image/png;image/jpg;
 Comment=Digital Painting and Animation
 Type=Application
-Icon=morevnastudio-krita
+Icon=morevnatoolchain-krita
 Categories=Qt;KDE;Graphics;
 X-KDE-NativeMimeType=application/x-krita
 X-KDE-ExtraNativeMimeTypes=
