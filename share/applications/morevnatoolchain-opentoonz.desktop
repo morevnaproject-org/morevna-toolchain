@@ -1,11 +1,12 @@
 #!/usr/bin/env xdg-open
+
 [Desktop Entry]
-Name=OpenToonz (Morevna Studio)
+Name=OpenToonz (Morevna Toolchain)
 Exec=opentoonz
 GenericName=Professional 2D animation software
 Comment=Professional 2D animation software
 Type=Application
-Icon=morevnastudio-opentoonz
+Icon=morevnatoolchain-opentoonz
 Categories=Qt;KDE;Graphics;
 X-KDE-ExtraNativeMimeTypes=
 StartupNotify=true

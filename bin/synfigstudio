@@ -3,4 +3,4 @@
 APP=synfigstudio
 
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-$SCRIPTPATH/morevna-studio exec ${APP} "$@"
+$SCRIPTPATH/morevna-toolchain exec ${APP} "$@"

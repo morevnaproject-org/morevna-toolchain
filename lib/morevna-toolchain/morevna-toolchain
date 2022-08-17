@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOREVNASTUDIO_VERSION=0.6
+export MOREVNATOOLCHAIN_VERSION=0.6
 export USE_0INSTALL=0
 
 set -e
@@ -83,28 +83,28 @@ find_version() {
 exec()
 {
     
-    if [ -z ${MOREVNASTUDIO_PATH_IS_SET} ];then
-    export PATH="${MOREVNASTUDIO_DIR}/bin/:$PATH"
+    if [ -z ${MOREVNATOOLCHAIN_PATH_IS_SET} ];then
+    export PATH="${MOREVNATOOLCHAIN_DIR}/bin/:$PATH"
     fi
-    export MOREVNASTUDIO_PATH_IS_SET=1
+    export MOREVNATOOLCHAIN_PATH_IS_SET=1
 
-    if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini" ]; then
-	source "${MOREVNASTUDIO_DIR}/etc/morevna-studio.ini"
+    if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini" ]; then
+	source "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini"
     fi
     
-    if [ -f $HOME/.config/morevna-studio/morevna-studio.ini ]; then
-    source $HOME/.config/morevna-studio/morevna-studio.ini
+    if [ -f $HOME/.config/morevna-toolchain/morevna-toolchain.ini ]; then
+    source $HOME/.config/morevna-toolchain/morevna-toolchain.ini
     fi
-    if [ ! -z $MOREVNASTUDIO_CACHEDIR ]; then
-    export ZEROINSTALL_PORTABLE_BASE=$MOREVNASTUDIO_CACHEDIR
+    if [ ! -z $MOREVNATOOLCHAIN_CACHEDIR ]; then
+    export ZEROINSTALL_PORTABLE_BASE=$MOREVNATOOLCHAIN_CACHEDIR
     fi
     
-    if [ -f $HOME/.config/morevna-studio/morevna-studio.version ]; then
-	source $HOME/.config/morevna-studio/morevna-studio.version
+    if [ -f $HOME/.config/morevna-toolchain/morevna-toolchain.version ]; then
+	source $HOME/.config/morevna-toolchain/morevna-toolchain.version
     fi
-    if [ ! -z "MOREVNASTUDIO_INSTALLED_VERSION" ] && [ "x$MOREVNASTUDIO_VERSION" != "x$MOREVNASTUDIO_INSTALLED_VERSION" ]; then
-	if [ -f "${MOREVNASTUDIO_DIR}/lib/morevna-studio/user-install" ]; then
-	    bash "${MOREVNASTUDIO_DIR}/lib/morevna-studio/user-install"
+    if [ ! -z "MOREVNATOOLCHAIN_INSTALLED_VERSION" ] && [ "x$MOREVNATOOLCHAIN_VERSION" != "x$MOREVNATOOLCHAIN_INSTALLED_VERSION" ]; then
+	if [ -f "${MOREVNATOOLCHAIN_DIR}/lib/morevna-toolchain/user-install" ]; then
+	    bash "${MOREVNATOOLCHAIN_DIR}/lib/morevna-toolchain/user-install"
 	fi
     fi
     
@@ -121,8 +121,8 @@ exec()
     
     APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
     
-    if [ -f "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf" ]; then
-	source "${MOREVNASTUDIO_DIR}/share/morevna-studio/packages/${APP}.conf"
+    if [ -f "${MOREVNATOOLCHAIN_DIR}/share/morevna-toolchain/packages/${APP}.conf" ]; then
+	source "${MOREVNATOOLCHAIN_DIR}/share/morevna-toolchain/packages/${APP}.conf"
     fi
 
     
@@ -165,7 +165,7 @@ exec()
     if [ ! -z ${APP_VERSION} ]; then
 	FOUND=0
 	# 1. Read ini configuration
-	if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ]; then
+	if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ]; then
 	    APP_PATH=""
 	    while IFS= read -r line
 	    do
@@ -175,7 +175,7 @@ exec()
 		    APP_PATH="${line#*=}"
 		    break
 		fi
-	    done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
 	    # TODO: On Windows check for .bat or .exe
 	    APP_PATH="${APP_PATH}/${BINARY}"
 	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
@@ -186,7 +186,7 @@ exec()
 	# 2. Check packages in opt
 	if [ ${FOUND} != 1 ]; then
 	    APP_DIR="${APP}-${APP_VERSION}"
-	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+	    for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
 		# TODO: On Windows check for .bat or .exe
 		APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
 		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
@@ -205,7 +205,7 @@ exec()
 	else
 	    echo "ERROR: Unable to find any installation of '${APP}'."
 	    echo "       Please make sure to add following line to"
-	    echo "       '${MOREVNASTUDIO_DIR}/etc/morevnastudio.d/${APP}.ini':"
+	    echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
 	    echo
 	    echo "              ${APP_NAME_UPPERCASE}_${APP_VERSION}=\"/path/to/app/binary\""
 	    echo
@@ -213,7 +213,7 @@ exec()
 	fi
     else
 	# 1. Read ini configuration
-	if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ]; then
+	if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ]; then
 	    APP_VERSION="DEFAULT"
 	    APP_PATH=""
 	    while IFS= read -r line
@@ -224,7 +224,7 @@ exec()
 		    APP_PATH="${line#*=}"
 		    break
 		fi
-	    done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+	    done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
 	    # TODO: On Windows check for .bat or .exe
 	    APP_PATH="${APP_PATH}/${BINARY}"
 	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
@@ -235,7 +235,7 @@ exec()
 	# 2. Check packages in opt
 	if [ "${FOUND}" != 1 ]; then
 	    APP_DIR="${APP}"
-	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+	    for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
 		# TODO: On Windows check for .bat or .exe
 		APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
 		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
@@ -256,7 +256,7 @@ exec()
 	if [ "${FOUND}" != 1 ]; then
 	    LATEST_VERSION=0
 	    LATEST_VERSION_PATH=""
-	    if [ -f "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini" ];then
+	    if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ];then
 		while IFS= read -r line
 		do
 		    APP_PATH="${line#*=}"
@@ -271,9 +271,9 @@ exec()
 			    fi
 			fi
 		    fi
-		done < "${MOREVNASTUDIO_DIR}/etc/morevna-studio.d/${APP}.ini"
+		done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
 	    fi
-	    for OPTDIR in "${MOREVNASTUDIO_DIR}/opt" "/opt"; do
+	    for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
 		if [ -f "${OPTDIR}/${APP}-"* ]; then
 		    for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
 			# TODO: On Windows check for .bat or .exe
@@ -297,7 +297,7 @@ exec()
 	    else
 		echo "ERROR: Unable to find any installation of '${APP}'."
 		echo "       Please make sure to add following line to"
-		echo "       '${MOREVNASTUDIO_DIR}/etc/morevnastudio.d/${APP}.ini':"
+		echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
 		echo
 		echo "              ${APP_NAME_UPPERCASE}_DEFAULT=\"/path/to/app/binary\""
 		echo
@@ -311,17 +311,17 @@ usage()
 {
 cat << EOF
 
-==========================================================
-Morevna Studio - software manager for animation production
-==========================================================
+=============================================================
+Morevna Toolchain - software manager for animation production
+=============================================================
 
 Usage:
-    morevna-studio exec APP [ARGS]
+    morevna-toolchain exec APP [ARGS]
    
 Examples:
-    morevna-studio exec blender
-    morevna-studio exec blender --help
-    MOREVNA_VERSION_BLENDER=2.78-1 morevna-studio exec blender
+    morevna-toolchain exec blender
+    morevna-toolchain exec blender --help
+    MOREVNA_VERSION_BLENDER=2.78-1 morevna-toolchain exec blender
 
 EOF
 }
@@ -337,8 +337,8 @@ main()
     fi
     
     SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-    export MOREVNASTUDIO_DIR=`dirname "$SCRIPTPATH"`
-    MOREVNASTUDIO_DIR=`dirname "$MOREVNASTUDIO_DIR"`
+    export MOREVNATOOLCHAIN_DIR=`dirname "$SCRIPTPATH"`
+    MOREVNATOOLCHAIN_DIR=`dirname "$MOREVNATOOLCHAIN_DIR"`
     
     case $1 in
 	exec)

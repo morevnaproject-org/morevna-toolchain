@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=Synfig (Morevna Studio)
+Name=Synfig (Morevna Toolchain)
 GenericName=2D animation software
 Exec=synfigstudio
-Icon=morevnastudio-synfigstudio
+Icon=morevnatoolchain-synfigstudio
 Categories=Graphics;
 X-Desktop-File-Install-Version=0.22
 TryExec=synfigstudio
