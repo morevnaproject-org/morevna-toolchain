@@ -161,149 +161,144 @@ exec()
     #  - 0install
     #  - /opt/package-version (latest) (fallback)
     
-    
     if [ ! -z ${APP_VERSION} ]; then
-	FOUND=0
-	# 1. Read ini configuration
-	if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ]; then
-	    APP_PATH=""
-	    while IFS= read -r line
-	    do
-		VERSION="${line%%=*}"
-		VERSION="${VERSION##*_}"
-		if [ "${VERSION}" == "${APP_VERSION}" ]; then
-		    APP_PATH="${line#*=}"
-		    break
-		fi
-	    done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
-	    # TODO: On Windows check for .bat or .exe
-	    APP_PATH="${APP_PATH}/${BINARY}"
-	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
-		FOUND=1
-		"${APP_PATH}" "${@:2}"
-	    fi
-	fi
-	# 2. Check packages in opt
-	if [ ${FOUND} != 1 ]; then
-	    APP_DIR="${APP}-${APP_VERSION}"
-	    for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
-		# TODO: On Windows check for .bat or .exe
-		APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
-		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
-		    FOUND=1
-		    "${APP_PATH}" "${@:2}"
-		    break
-		fi
-	    done
-	fi
-	# 3. Use 0-install
-	if [ ${FOUND} != 1 ] && [ ${USE_0INSTALL} == 1 ] && [ ! -z "${URI_0INSTALL}" ]; then
-	    VERSION_OPTION="--version=${APP_VERSION}"
-	    # We can call alternative binary via "--command" option.
-	    # See - https://docs.0install.net/specifications/feed/#commands
-	    0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
-	else
-	    echo "ERROR: Unable to find any installation of '${APP}'."
-	    echo "       Please make sure to add following line to"
-	    echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
-	    echo
-	    echo "              ${APP_NAME_UPPERCASE}_${APP_VERSION}=\"/path/to/app/binary\""
-	    echo
-	    exit 1
-	fi
-    else
-	# 1. Read ini configuration
-	if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ]; then
-	    APP_VERSION="DEFAULT"
-	    APP_PATH=""
-	    while IFS= read -r line
-	    do
-		VERSION="${line%%=*}"
-		VERSION="${VERSION##*_}"
-		if [ "${VERSION}" == "${APP_VERSION}" ]; then
-		    APP_PATH="${line#*=}"
-		    break
-		fi
-	    done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
-	    # TODO: On Windows check for .bat or .exe
-	    APP_PATH="${APP_PATH}/${BINARY}"
-	    if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
-		FOUND=1
-		"${APP_PATH}" "${@:2}"
-	    fi
-	fi
-	# 2. Check packages in opt
-	if [ "${FOUND}" != 1 ]; then
-	    APP_DIR="${APP}"
-	    for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
-		# TODO: On Windows check for .bat or .exe
-		APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
-		if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
-		    FOUND=1
-		    "${APP_PATH}" "${@:2}"
-		    break
-		fi
-	    done
-	fi
-	# 3. Use 0-install
-	if [ "${FOUND}" != 1 ] && [ "${USE_0INSTALL}" == 1 ] && [ ! -z "${URI_0INSTALL}" ]; then
-	    VERSION_OPTION=""
-	    # We can call alternative binary via "--command" option.
-	    # See - https://docs.0install.net/specifications/feed/#commands
-	    0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
-	fi
-	# 4. Use latest installed version
-	if [ "${FOUND}" != 1 ]; then
-	    LATEST_VERSION=0
-	    LATEST_VERSION_PATH=""
-	    if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ];then
-		while IFS= read -r line
-		do
-		    APP_PATH="${line#*=}"
-		    if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
-			VERSION="${line%%=*}"
-			VERSION="${VERSION##*_}"
-			if [[ "${VERSION}" != "DEFAULT" ]]; then
-			    RESULT=`compare_versions $LATEST_VERSION, $VERSION`
-			    if [ "$RESULT" == '<' ]; then
-				LATEST_VERSION="$VERSION"
-				LATEST_VERSION_PATH="${APP_PATH}"
-			    fi
-			fi
-		    fi
-		done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
-	    fi
-	    for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
-		if [ -f "${OPTDIR}/${APP}-"* ]; then
-		    for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
+		FOUND=0
+		# 1. Read ini configuration
+		if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ]; then
+			APP_PATH=""
+			while IFS= read -r line; do
+				VERSION="${line%%=*}"
+				VERSION="${VERSION##*_}"
+				if [ "${VERSION}" == "${APP_VERSION}" ]; then
+					APP_PATH="${line#*=}"
+					break
+				fi
+			done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
 			# TODO: On Windows check for .bat or .exe
-			APP_PATH="${DIR}/${BINARY}"
-			if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
-			    VERSION="${DIR##*-}"
-			    RESULT=`compare_versions $LATEST_VERSION $VERSION`
-			    if [ "$RESULT" == '<' ]; then
-				LATEST_VERSION="$VERSION"
-				LATEST_VERSION_PATH="${APP_PATH}"
-			    fi
+			APP_PATH="${APP_PATH}/${BINARY}"
+			if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+				FOUND=1
+				"${APP_PATH}" "${@:2}"
 			fi
-			
-		    done
 		fi
-	    done
-	    
-	    if [ ! -z "${LATEST_VERSION_PATH}" ]; then
-		echo "${LATEST_VERSION_PATH}"
-		"${LATEST_VERSION_PATH}" "${@:2}"
-	    else
-		echo "ERROR: Unable to find any installation of '${APP}'."
-		echo "       Please make sure to add following line to"
-		echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
-		echo
-		echo "              ${APP_NAME_UPPERCASE}_DEFAULT=\"/path/to/app/binary\""
-		echo
-		exit 1
-	    fi
-	fi
+		# 2. Check packages in opt
+		if [ ${FOUND} != 1 ]; then
+			APP_DIR="${APP}-${APP_VERSION}"
+			for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
+				# TODO: On Windows check for .bat or .exe
+				APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
+				if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+					FOUND=1
+					"${APP_PATH}" "${@:2}"
+					break
+				fi
+			done
+		fi
+		# 3. Use 0-install
+		if [ ${FOUND} != 1 ] && [ ${USE_0INSTALL} == 1 ] && [ ! -z "${URI_0INSTALL}" ]; then
+			VERSION_OPTION="--version=${APP_VERSION}"
+			# We can call alternative binary via "--command" option.
+			# See - https://docs.0install.net/specifications/feed/#commands
+			0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
+		else
+			echo "ERROR: Unable to find any installation of '${APP}'."
+			echo "       Please make sure to add following line to"
+			echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
+			echo
+			echo "              ${APP_NAME_UPPERCASE}_${APP_VERSION}=\"/path/to/app/binary\""
+			echo
+			exit 1
+		fi
+    else # ${APP_VERSION} is undefined - use latest/default version
+		# 1. Read ini configuration
+		if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ]; then
+			APP_VERSION="DEFAULT"
+			APP_PATH=""
+			while IFS= read -r line; do
+				VERSION="${line%%=*}"
+				VERSION="${VERSION##*_}"
+				if [ "${VERSION}" == "${APP_VERSION}" ]; then
+					APP_PATH="${line#*=}"
+					break
+				fi
+			done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
+			# TODO: On Windows check for .bat or .exe
+			APP_PATH="${APP_PATH}/${BINARY}"
+			if [ ! -z "${APP_PATH}" ] && [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+				FOUND=1
+				"${APP_PATH}" "${@:2}"
+			fi
+		fi
+		# 2. Check packages in opt
+		if [ "${FOUND}" != 1 ]; then
+			APP_DIR="${APP}"
+			for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
+				# TODO: On Windows check for .bat or .exe
+				APP_PATH="${OPTDIR}/${APP_DIR}/${BINARY}"
+				if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+					FOUND=1
+					"${APP_PATH}" "${@:2}"
+					break
+				fi
+			done
+		fi
+		# 3. Use 0-install
+		if [ "${FOUND}" != 1 ] && [ "${USE_0INSTALL}" == 1 ] && [ ! -z "${URI_0INSTALL}" ]; then
+			VERSION_OPTION=""
+			# We can call alternative binary via "--command" option.
+			# See - https://docs.0install.net/specifications/feed/#commands
+			0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
+		fi
+		# 4. Use latest installed version
+		if [ "${FOUND}" != 1 ]; then
+			LATEST_VERSION=0
+			LATEST_VERSION_PATH=""
+			if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini" ];then
+				while IFS= read -r line; do
+					APP_PATH="${line#*=}"
+					if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+						VERSION="${line%%=*}"
+						VERSION="${VERSION##*_}"
+						if [[ "${VERSION}" != "DEFAULT" ]]; then
+							RESULT=`compare_versions $LATEST_VERSION, $VERSION`
+							if [ "$RESULT" == '<' ]; then
+								LATEST_VERSION="$VERSION"
+								LATEST_VERSION_PATH="${APP_PATH}"
+							fi
+						fi
+					fi
+				done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
+			fi
+			for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
+				if [ -f "${OPTDIR}/${APP}-"* ]; then
+					for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
+					# TODO: On Windows check for .bat or .exe
+					APP_PATH="${DIR}/${BINARY}"
+					if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
+						VERSION="${DIR##*-}"
+						RESULT=`compare_versions $LATEST_VERSION $VERSION`
+						if [ "$RESULT" == '<' ]; then
+							LATEST_VERSION="$VERSION"
+							LATEST_VERSION_PATH="${APP_PATH}"
+						fi
+					fi
+					done
+				fi
+			done
+			
+			if [ ! -z "${LATEST_VERSION_PATH}" ]; then
+				echo "${LATEST_VERSION_PATH}"
+				"${LATEST_VERSION_PATH}" "${@:2}"
+			else
+				echo "ERROR: Unable to find any installation of '${APP}'."
+				echo "       Please make sure to add following line to"
+				echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
+				echo
+				echo "              ${APP_NAME_UPPERCASE}_DEFAULT=\"/path/to/app/binary\""
+				echo
+				exit 1
+			fi
+		fi
     fi
 }
 
