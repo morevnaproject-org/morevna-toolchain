@@ -8,7 +8,9 @@ install()
 {
     echo "Installing Morevna Toolchain..."
     
-    source ${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini
+    if [ -f ${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini ]; then
+        source ${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini
+    fi
     
     #[ -d $HOME/.local/morevna-toolchain/bin/ ] || mkdir -p $HOME/.local/morevna-toolchain/bin/
     # TODO: install scripts from "apps/" dir
