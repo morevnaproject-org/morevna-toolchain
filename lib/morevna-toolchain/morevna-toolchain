@@ -56,7 +56,13 @@ find_version() {
 	else
 		TESTDIR="$1"
 	fi
-	if [ -f "$TESTDIR/packages.txt" ]; then
+	ENVFILE=""
+	if [ -f "$TESTDIR/env.txt" ]; then
+		ENVFILE="env.txt"
+	elif [ -f "$TESTDIR/packages.txt" ]; then
+		ENVFILE="packages.txt"
+	fi
+	if [ ! -z "$ENVFILE" ]; then
 		# Read contents of file
 		VERSION=""
 		while IFS= read -r line
@@ -66,7 +72,7 @@ find_version() {
 			VERSION="${line#*=}"
 			break
 		    fi
-		done < "$TESTDIR/packages.txt"
+		done < "$TESTDIR/$ENVFILE"
 		if [ -z "$VERSION" ]; then
 		    find_version "`dirname \"$TESTDIR\"`"
 		else
