@@ -9,9 +9,9 @@ uninstall()
     echo "Uninstalling Morevna Toolchain..."
     source ${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini
     
-    rm -rf "$HOME/.local/share/icons/morevnatoolchain-*"
-    rm -rf "$HOME/.local/share/applications/morevnatoolchain-*"
-    rm -rf "$HOME/.local/share/mime/packages/morevnatoolchain-*"
+    rm -rf "$HOME/.local/share/icons/morevnatoolchain-"*
+    rm -rf "$HOME/.local/share/applications/morevnatoolchain-"*
+    rm -rf "$HOME/.local/share/mime/packages/morevnatoolchain-"*
     
     update-desktop-database $HOME/.local/share/applications
     
