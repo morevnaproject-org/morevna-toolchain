@@ -54,7 +54,9 @@ install()
     update-desktop-database $HOME/.local/share/applications
     update-mime-database $HOME/.local/share/mime/ || true
     
-    #kbuildsycoca5 || kbuildsycoca4 --noincremental || true
+    bash ${MOREVNATOOLCHAIN_DIR}/opt/renderchan/renderchan-git/desktop/kde-actions/install.sh
+    bash ${MOREVNATOOLCHAIN_DIR}/opt/renderchan/renderchan-git/desktop/nautilus-actions-3/install.sh
+    kbuildsycoca5 || kbuildsycoca4 --noincremental || true
     
     echo "MOREVNATOOLCHAIN_INSTALLED_VERSION=$MOREVNATOOLCHAIN_VERSION" > $HOME/.config/morevna-toolchain/morevna-toolchain.version
     
@@ -74,6 +76,10 @@ install()
     fi
     echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"${MOREVNATOOLCHAIN_DIR}/bin:\$PATH\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.xsessionrc
 
+    # Appimages no desktop integration
+    [ -d ${HOME}/.local/share/appimagekit ] || mkdir -p ${HOME}/.local/share/appimagekit || true
+    touch ${HOME}/.local/share/appimagekit/OpenToonzMorevnaEdition_no_desktopintegration
+    touch ${HOME}/.local/share/appimagekit/SynfigStudio_no_desktopintegration
 }
 
 install "$@"
