@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export MOREVNATOOLCHAIN_VERSION=0.6
+export MOREVNATOOLCHAIN_VERSION=0.7
 export USE_0INSTALL=0
 
 set -e
