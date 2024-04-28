@@ -2,5 +2,9 @@
 
 APP=blender
 
+if [ ! -z $VGL_PROBEGLX ] && [ -f /opt/VirtualGL/bin/vglrun ]; then
+    export VGLRUN="/opt/VirtualGL/bin/vglrun "
+fi
+
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-$SCRIPTPATH/morevna-toolchain exec ${APP} "$@"
+${VGLRUN}${SCRIPTPATH}/morevna-toolchain exec ${APP} "$@"
