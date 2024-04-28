@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Enve (Morevna Toolchain)
+GenericName=2D animation software
+Exec=enve
+Icon=morevnatoolchain-enve
+Categories=Graphics;
+X-Desktop-File-Install-Version=0.22
+TryExec=enve
