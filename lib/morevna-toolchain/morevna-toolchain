@@ -108,11 +108,11 @@ exec()
     if [ -f $HOME/.config/morevna-toolchain/morevna-toolchain.version ]; then
 	source $HOME/.config/morevna-toolchain/morevna-toolchain.version
     fi
-    if [ ! -z "MOREVNATOOLCHAIN_INSTALLED_VERSION" ] && [ "x$MOREVNATOOLCHAIN_VERSION" != "x$MOREVNATOOLCHAIN_INSTALLED_VERSION" ]; then
-	if [ -f "${MOREVNATOOLCHAIN_DIR}/lib/morevna-toolchain/user-install" ]; then
-	    bash "${MOREVNATOOLCHAIN_DIR}/lib/morevna-toolchain/user-install"
-	fi
-    fi
+#    if [ ! -z "MOREVNATOOLCHAIN_INSTALLED_VERSION" ] && [ "x$MOREVNATOOLCHAIN_VERSION" != "x$MOREVNATOOLCHAIN_INSTALLED_VERSION" ]; then
+#	if [ -f "${MOREVNATOOLCHAIN_DIR}/lib/morevna-toolchain/user-install" ]; then
+#	    bash "${MOREVNATOOLCHAIN_DIR}/lib/morevna-toolchain/user-install"
+#	fi
+#    fi
     
     export APP="${1%/*}"
     export BINARY="${1#*/}"
