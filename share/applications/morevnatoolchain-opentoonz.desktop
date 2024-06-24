@@ -11,4 +11,4 @@ Categories=Qt;KDE;Graphics;
 X-KDE-ExtraNativeMimeTypes=
 StartupNotify=true
 X-Desktop-File-Install-Version=0.23
-TryExec=opentoonz
+MimeType=application/x-opentoonz;
