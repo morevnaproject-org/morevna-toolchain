@@ -208,6 +208,8 @@ exec()
 			FOUND=1
 			0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
 		fi
+#-----------------------------------------------------------------
+#-----------------------------------------------------------------
 		if [ ${FOUND} != 1 ]; then
 			echo "ERROR: Unable to find any installation of '${APP}'."
 			echo "       Please make sure to add following line to"
