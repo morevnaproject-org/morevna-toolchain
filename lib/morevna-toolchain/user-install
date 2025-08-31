@@ -65,16 +65,16 @@ install()
     if ( cat ~/.profile | grep "# morevna-toolchain/bin" >/dev/null ); then
 	sed -i "/.*# morevna-toolchain\/bin.*/d"  ${HOME}/.profile
     fi
-    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"${MOREVNATOOLCHAIN_DIR}/bin:\$PATH\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.profile
+    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"\$PATH:${MOREVNATOOLCHAIN_DIR}/bin\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.profile
     [ -f ${HOME}/.bash_profile ] || touch ${HOME}/.bash_profile
     if ( cat ~/.bash_profile | grep "# morevna-toolchain/bin" >/dev/null ); then
 	sed -i "/.*# morevna-toolchain\/bin.*/d" $HOME/.bash_profile
     fi
-    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"${MOREVNATOOLCHAIN_DIR}/bin:\$PATH\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.bash_profile
+    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"\$PATH:${MOREVNATOOLCHAIN_DIR}/bin\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.bash_profile
     if ( cat ~/.xsessionrc | grep "# morevna-toolchain/bin" >/dev/null ); then
 	sed -i "/.*# morevna-toolchain\/bin.*/d" ~/.xsessionrc
     fi
-    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"${MOREVNATOOLCHAIN_DIR}/bin:\$PATH\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.xsessionrc
+    echo "[ ! -z \${MOREVNATOOLCHAIN_PATH_IS_SET} ] || export PATH=\"\$PATH:${MOREVNATOOLCHAIN_DIR}/bin\" && export MOREVNATOOLCHAIN_PATH_IS_SET=1 # morevna-toolchain/bin" >> ${HOME}/.xsessionrc
 
     # Appimages no desktop integration
     [ -d ${HOME}/.local/share/appimagekit ] || mkdir -p ${HOME}/.local/share/appimagekit || true
