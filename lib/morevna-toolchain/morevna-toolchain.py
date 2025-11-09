@@ -7,7 +7,6 @@ from subprocess import run
 import platform
 
 MOREVNATOOLCHAIN_VERSION = '0.7'
-USE_0INSTALL = 0
 
 def compare_versions(v1, v2):
     v1 = re.sub(r'-', '.', v1)
@@ -64,9 +63,11 @@ def find_version(testdir, app):
 
 def exec_app(app, *args):
 
-    MOREVNATOOLCHAIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    MOREVNATOOLCHAIN_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     os.environ['PATH'] = os.path.join(MOREVNATOOLCHAIN_DIR, 'bin') + ':' + os.environ.get('PATH', '')
     #os.environ['MOREVNATOOLCHAIN_PATH_IS_SET'] = '1'
+
+    USE_0INSTALL = 0
     
     config_files = [
         os.path.join(MOREVNATOOLCHAIN_DIR,"etc","morevna-toolchain.ini"),
@@ -78,40 +79,46 @@ def exec_app(app, *args):
             with open(config_file, "r") as f:
                 for line in f:
                     if line.strip().startswith("export "):
+                        print(line)
                         key, value = line.strip().split("=")
-                        os.environ[key.strip()] = value.strip()[1:-1]
+                        if key=="USE_0INSTALL":
+                            USE_0INSTALL = int(value.strip()[1:-1])
+                        print(key)
 
     cache_dir = os.environ.get("MOREVNATOOLCHAIN_CACHEDIR")
     if cache_dir:
         os.environ["ZEROINSTALL_PORTABLE_BASE"] = cache_dir
     
     # Autoupdate configuration (Linux only ATM)
-    if platform.system() == "Linux":
-        version_file=os.path.join(os.path.expanduser('~'), '.config', 'morevna-toolchain', 'morevna-toolchain.version')
-        if os.path.exists(version_file):
-            with open(version_file, 'r') as f:
-                for line in f:
-                    if line.startswith('MOREVNATOOLCHAIN_INSTALLED_VERSION='):
-                        installed_version = line.split('=')[1].strip()
-                        if installed_version != MOREVNATOOLCHAIN_VERSION:
-                            if os.path.exists(os.path.join(MOREVNATOOLCHAIN_DIR, 'lib', 'morevna-toolchain', 'user-install')):
-                                run([os.path.join(MOREVNATOOLCHAIN_DIR, 'lib', 'morevna-toolchain', 'user-install')])
+    #if platform.system() == "Linux":
+    #    version_file=os.path.join(os.path.expanduser('~'), '.config', 'morevna-toolchain', 'morevna-toolchain.version')
+    #    if os.path.exists(version_file):
+    #        with open(version_file, 'r') as f:
+    #            for line in f:
+    #                if line.startswith('MOREVNATOOLCHAIN_INSTALLED_VERSION='):
+    #                    installed_version = line.split('=')[1].strip()
+    #                    if installed_version != MOREVNATOOLCHAIN_VERSION:
+    #                        if os.path.exists(os.path.join(MOREVNATOOLCHAIN_DIR, 'lib', 'morevna-toolchain', 'user-install')):
+    #                            run([os.path.join(MOREVNATOOLCHAIN_DIR, 'lib', 'morevna-toolchain', 'user-install')])
     
-    app = app.split("/")[0]
-    if len(app.split("/"))>1:
-        binary = app.split("/")[1]
-    else:
-        binary = app.split("/")[0]
+    #app_name_uppercase=app.upper()
+
+    binary=""
+    if len(app.split("/"))==1:
+        binary = app
         binary_0install_option = 'run'
     else:
+        binary = app.split("/")[1]
+        app = app.split("/")[0]
         # We can call alternative binary via "--command" option.
         # See - https://docs.0install.net/specifications/feed/#commands
         binary_0install_option = binary
     
     URI_0INSTALL=""
     EXTENSIONS=[]
-    if os.path.exists(os.path.join(MOREVNATOOLCHAIN_DIR, 'share', 'morevna-toolchain', 'packages', app + '.conf')):
-        with open(os.path.join(MOREVNATOOLCHAIN_DIR, 'share', 'morevna-toolchain', 'packages', app + '.conf'), 'r') as f:
+    conf_file = os.path.join(MOREVNATOOLCHAIN_DIR, 'share', 'morevna-toolchain', 'packages', app + '.conf')
+    if os.path.exists(conf_file):
+        with open(conf_file, 'r') as f:
             for line in f:
                 if line.startswith('URI_0INSTALL='):
                     URI_0INSTALL = line.split('=')[1].strip()
@@ -135,6 +142,7 @@ def exec_app(app, *args):
     else:
         app_version = find_version(os.getcwd(), app)
         
+    print(app_version)
     # a. If version is not empty
     #  - ini configuration
     #  - /opt/package-version
@@ -153,7 +161,7 @@ def exec_app(app, *args):
             with open(os.path.join(MOREVNATOOLCHAIN_DIR, 'etc', 'morevna-toolchain.d', app + '.ini'), 'r') as f:
                 for line in f:
                     version, path = line.split('=')
-                    if len(version.strip().split("_"))>1 and version.strip().split("_")[1] == app_version:
+                    if version.strip() == app_version:
                         app_path = path.strip()
                         break
             # TODO: On Windows check for .bat or .exe
@@ -174,13 +182,10 @@ def exec_app(app, *args):
                     break
 
         # 3. Use 0-install
-        if found != 1 and os.environ['USE_0INSTALL'] == 1 and URI_0INSTALL != "":
+        if found != 1 and USE_0INSTALL == 1 and URI_0INSTALL != "":
             version_option = f'--version={app_version}'
             found = 1
             run(['0install', 'run', version_option, f'--command={binary_0install_option}', URI_0INSTALL] + list(args))
-
-#---------------------------------------------------------
-#---------------------------------------------------------
 
     else:  # app_version is undefined - use latest/default version
         # 1. Read ini configuration
@@ -201,19 +206,17 @@ def exec_app(app, *args):
         
         # 2. Check packages in opt
         if found != 1:
-            app_dir = app
             for optdir in [os.path.join(MOREVNATOOLCHAIN_DIR, 'opt'), '/opt']:
-                app_path = os.path.join(optdir, app_dir, binary)
+                app_path = os.path.join(optdir, app, binary)
                 if os.path.exists(app_path) and os.access(app_path, os.X_OK):
                     found = 1
                     run([app_path] + list(args))
                     break
         
         # 3. Use 0-install
-        if found != 1 and USE_0INSTALL == 1 and 'URI_0INSTALL' in os.environ:
-            version_option = ''
+        if found != 1 and USE_0INSTALL == 1 and URI_0INSTALL != "":
             found = 1
-            run(['0install', 'run', version_option, f'--command={binary_0install_option}', os.environ['URI_0INSTALL']] + list(args[1:]))
+            run(['0install', 'run', f'--command={binary_0install_option}', URI_0INSTALL] + list(args[1:]))
         
         # 4. Use latest installed version
         if found != 1:
@@ -231,16 +234,15 @@ def exec_app(app, *args):
                                     latest_version = version
                                     latest_version_path = path
             for optdir in [os.path.join(MOREVNATOOLCHAIN_DIR, 'opt'), '/opt']:
-                if os.path.exists(os.path.join(optdir, app + '-*')):
-                    for dir in os.listdir(os.path.join(optdir, app + '-*')):
-                        app_path = os.path.join(dir, binary)
-                        if os.path.exists(app_path) and os.access(app_path, os.X_OK):
-                            version = dir.split('-')[-1]
-                            result = compare_versions(latest_version, version)
-                            if result == '<':
-                                latest_version = version
-                                latest_version_path = app_path
-                                if latest_version_path:
+                for dir in os.listdir(optdir):
+                    path_dir = os.path.join(optdir, dir)
+                    if os.path.isdir(path_dir) and dir.startswith(app + "-"):
+                        version = dir.split('-')[-1]
+                        result = compare_versions(latest_version, version)
+                        if result == '<':
+                            latest_version = version
+                            latest_version_path = app_path
+            if latest_version_path:
                 found = 1
                 run([latest_version_path] + list(args[1:]))
     
@@ -249,7 +251,7 @@ def exec_app(app, *args):
         print(f"       Please make sure to add following line to")
         print(f"       '{MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/{app}.ini':")
         print()
-        print(f"              {app_name_uppercase}_DEFAULT=\"/path/to/app/binary\"")
+        print(f"              {app.upper()}_DEFAULT=\"/path/to/app/binary\"")
         print()
         sys.exit(1)
 
