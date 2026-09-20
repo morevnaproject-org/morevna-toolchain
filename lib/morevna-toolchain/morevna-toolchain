@@ -9,17 +9,17 @@ compare_versions () {
     #
     # Source - https://stackoverflow.com/a/4025065
     #
-    
+
     if [[ $1 == $2 ]]
     then
         echo '='
 	return 0
     fi
-    
+
     # Fix '-' (Blender 2.82-1)
     arg1=${1//-/.}
     arg2=${2//-/.}
-    
+
     local IFS=.
     local i ver1=($arg1) ver2=($arg2)
     # fill empty fields in ver1 with zeros
@@ -88,7 +88,7 @@ find_version() {
 
 exec()
 {
-    
+
     if [ -z ${MOREVNATOOLCHAIN_PATH_IS_SET} ];then
     export PATH="${MOREVNATOOLCHAIN_DIR}/bin/:$PATH"
     fi
@@ -97,14 +97,14 @@ exec()
     if [ -f "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini" ]; then
 	source "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.ini"
     fi
-    
+
     if [ -f $HOME/.config/morevna-toolchain/morevna-toolchain.ini ]; then
     source $HOME/.config/morevna-toolchain/morevna-toolchain.ini
     fi
     if [ ! -z $MOREVNATOOLCHAIN_CACHEDIR ]; then
     export ZEROINSTALL_PORTABLE_BASE=$MOREVNATOOLCHAIN_CACHEDIR
     fi
-    
+
     if [ -f $HOME/.config/morevna-toolchain/morevna-toolchain.version ]; then
 	source $HOME/.config/morevna-toolchain/morevna-toolchain.version
     fi
@@ -113,7 +113,7 @@ exec()
 #	    bash "${MOREVNATOOLCHAIN_DIR}/lib/morevna-toolchain/user-install"
 #	fi
 #    fi
-    
+
     export APP="${1%/*}"
     export BINARY="${1#*/}"
     if [ -z ${BINARY} ] || [[ "${APP}" == "${1}" ]]; then
@@ -124,21 +124,21 @@ exec()
 	# See - https://docs.0install.net/specifications/feed/#commands
 	export BINARY_0INSTALL_OPTION="${BINARY}"
     fi
-    
+
     APP_NAME_UPPERCASE=`printf '%s\n' "$1" | awk '{ print toupper($0) }'`
-    
+
     if [ -f "${MOREVNATOOLCHAIN_DIR}/share/morevna-toolchain/packages/${APP}.conf" ]; then
 	source "${MOREVNATOOLCHAIN_DIR}/share/morevna-toolchain/packages/${APP}.conf"
     fi
 
-    
+
     #APP_VERSION=$MOREVNA_VERSION_BLENDER
     #
     #if [ -z $APP_VERSION ]; then
 	# TODO: Detect version from RenderChan
 	#echo ...
     #fi
-    
+
     # find which file we are working with
     ARG_FILE=""
     for ARG in "$@"; do
@@ -148,7 +148,7 @@ exec()
 	    fi
 	done
     done
-    
+
     # find package version defined for this file
     if [ ! -z "${ARG_FILE}" ]; then
 	ARG_FILE_DIRNAME=`dirname "${ARG_FILE}"`
@@ -156,7 +156,7 @@ exec()
     else
 	APP_VERSION=$(find_version "`pwd`")
     fi
-    
+
     # a. If version is not empty
     #  - ini configuration
     #  - /opt/package-version
@@ -166,7 +166,7 @@ exec()
     #  - /opt/package
     #  - 0install
     #  - /opt/package-version (latest) (fallback)
-    
+
     FOUND=0
     if [ ! -z ${APP_VERSION} ]; then
 		# 1. Read ini configuration
@@ -209,11 +209,13 @@ exec()
 			0install run ${VERSION_OPTION} --command=${BINARY_0INSTALL_OPTION} ${URI_0INSTALL} "${@:2}"
 		fi
 		if [ ${FOUND} != 1 ]; then
+
 			echo "ERROR: Unable to find any installation of '${APP}'."
-			echo "       Please make sure to add following line to"
-			echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
+			echo "       To specify path to ${APP} installation you can create"
+			echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini'"
+			echo "       configuration file and write a line like this inside:"
 			echo
-			echo "              ${APP_NAME_UPPERCASE}_${APP_VERSION}=\"/path/to/app/binary\""
+			echo "              ${APP_NAME_UPPERCASE}_${APP_VERSION}=/path/to/app/dir"
 			echo
 			exit 1
 		fi
@@ -294,7 +296,7 @@ exec()
 					done
 				fi
 			done
-			
+
 			if [ ! -z "${LATEST_VERSION_PATH}" ]; then
 				echo "${LATEST_VERSION_PATH}"
 				FOUND=1
@@ -303,10 +305,11 @@ exec()
 		fi
 		if [ "${FOUND}" != 1 ]; then
 			echo "ERROR: Unable to find any installation of '${APP}'."
-			echo "       Please make sure to add following line to"
-			echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini':"
+			echo "       To specify path to ${APP} installation you can create"
+			echo "       '${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini'"
+			echo "       configuration file and write a line like this inside:"
 			echo
-			echo "              ${APP_NAME_UPPERCASE}_DEFAULT=\"/path/to/app/binary\""
+			echo "              ${APP_NAME_UPPERCASE}_DEFAULT=/path/to/app/dir"
 			echo
 			exit 1
 		fi
@@ -323,7 +326,7 @@ Morevna Toolchain - software manager for animation production
 
 Usage:
     morevna-toolchain exec APP [ARGS]
-   
+
 Examples:
     morevna-toolchain exec blender
     morevna-toolchain exec blender --help
@@ -336,16 +339,16 @@ main()
 {
     # TODO: Check if 0install available
     # ...
-    
+
     if [ -z "$1" ]; then
 	usage
 	exit 1
     fi
-    
+
     SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
     export MOREVNATOOLCHAIN_DIR=`dirname "$SCRIPTPATH"`
     MOREVNATOOLCHAIN_DIR=`dirname "$MOREVNATOOLCHAIN_DIR"`
-    
+
     case $1 in
 	exec)
 	    if [ -z "$2" ]; then
