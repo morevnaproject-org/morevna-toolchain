@@ -281,9 +281,8 @@ exec()
 				done < "${MOREVNATOOLCHAIN_DIR}/etc/morevna-toolchain.d/${APP}.ini"
 			fi
 			for OPTDIR in "${MOREVNATOOLCHAIN_DIR}/opt" "/opt"; do
-				if [ -f "${OPTDIR}/${APP}-"* ]; then
-					for DIR in `ls -1d "${OPTDIR}/${APP}-"*`; do
-					# TODO: On Windows check for .bat or .exe
+				for DIR in "${OPTDIR}/${APP}-"*; do
+					[ -d "${DIR}" ] || continue
 					APP_PATH="${DIR}/${BINARY}"
 					if [ -x "${APP_PATH}" ] && [ ! -d "${APP_PATH}" ]; then
 						VERSION="${DIR##*-}"
@@ -293,8 +292,7 @@ exec()
 							LATEST_VERSION_PATH="${APP_PATH}"
 						fi
 					fi
-					done
-				fi
+				done
 			done
 			
 			if [ ! -z "${LATEST_VERSION_PATH}" ]; then
