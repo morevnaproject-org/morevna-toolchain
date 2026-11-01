@@ -78,12 +78,10 @@ def exec_app(app, *args):
         if os.path.exists(config_file):
             with open(config_file, "r") as f:
                 for line in f:
-                    if line.strip().startswith("export "):
-                        print(line)
+                    if line.strip().startswith("USE_0INSTALL"):
                         key, value = line.strip().split("=")
                         if key=="USE_0INSTALL":
-                            USE_0INSTALL = int(value.strip()[1:-1])
-                        print(key)
+                            USE_0INSTALL = int(value.strip())
 
     cache_dir = os.environ.get("MOREVNATOOLCHAIN_CACHEDIR")
     if cache_dir:
@@ -141,8 +139,8 @@ def exec_app(app, *args):
         app_version = find_version(arg_file_dirname, app)
     else:
         app_version = find_version(os.getcwd(), app)
-        
-    print(app_version)
+
+
     # a. If version is not empty
     #  - ini configuration
     #  - /opt/package-version
@@ -152,7 +150,7 @@ def exec_app(app, *args):
     #  - /opt/package
     #  - 0install
     #  - /opt/package-version (latest) (fallback)
-    
+
     found = 0
     if app_version:
         # 1. Read ini configuration
@@ -241,7 +239,7 @@ def exec_app(app, *args):
                         result = compare_versions(latest_version, version)
                         if result == '<':
                             latest_version = version
-                            latest_version_path = app_path
+                            latest_version_path = os.path.join(path_dir,app)
             if latest_version_path:
                 found = 1
                 run([latest_version_path] + list(args[1:]))
